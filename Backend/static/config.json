@@ -1,0 +1,12 @@
+{
+  "portlist":[
+    "/dev/ttyACM0",
+    "/dev/ttyUSB0",
+    "/dev/ttyUSB1",
+    "/dev/ttyUSB2",
+    "/dev/ttyUSB3",
+    "/dev/tty.usbserial-A9CZ7XPL",
+    "/dev/tty.usbserial-A8007ZmJ",
+    "/dev/tty.usbmodem1421"
+  ]
+}
