@@ -11,11 +11,23 @@
           </option>
         </b-select>
       </b-field>
-      <button v-on:click="startReadXbee">Start reading xbee</button>
-      <button v-on:click="stopReadXbee">Stop reading xbee</button>
+      <button v-on:click="startArduino">Start reading xbee</button>
+      <button v-on:click="stopArduino">Stop reading xbee</button>
       <button v-on:click="fakeAcquisition">Fake points</button>
       <div v-if="this.chartOptions !== undefined">
         <highcharts :options="chartOptions" ref="lineCharts"></highcharts>
+      </div>
+      <div class="columns">
+        <div class="column is-1">
+          <button v-on:click="sendCommand('a')">Left</button>
+        </div>
+        <div class="column is-1">
+          <button v-on:click="sendCommand('w')">Forward</button>
+          <button v-on:click="sendCommand('s')">Backward</button>
+        </div>
+        <div class="column is-1">
+          <button v-on:click="sendCommand('d')">Right</button>
+        </div>
       </div>
     </div>
   </div>
@@ -42,22 +54,29 @@ export default {
   },
 
   methods: {
-    startReadXbee: function () {
+    startArduino: function () {
       console.log('Selected port: ', this.selectedPort)
-      axios.post('/api/startXbee', {selectedPort: this.selectedPort}).then(response => {
-        console.log(response)
+      axios.post('/api/startArduino', {selectedPort: this.selectedPort}).then(response => {
+        console.log(response.data.message)
       })
     },
 
-    stopReadXbee: function () {
-      axios.get('/api/stopXbee').then(response => {
-        console.log(response)
+    stopArduino: function () {
+      axios.get('/api/stopArduino').then(response => {
+        console.log(response.data.message)
       })
     },
 
     fakeAcquisition: function () {
       axios.get('/api/startFakeAcq').then(response => {
-        console.log(response)
+        console.log(response.data.message)
+      })
+    },
+
+    sendCommand: function (theCommand) {
+      console.log(theCommand)
+      axios.post('/api/sendCommandToArduino', {command: theCommand}).then(response => {
+        console.log(response.data.message)
       })
     },
 

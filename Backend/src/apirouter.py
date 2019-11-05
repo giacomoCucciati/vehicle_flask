@@ -20,22 +20,39 @@ portList = json_data['portlist']
 
 @apirouter.route('/startArduino',methods=['POST'])
 def startArduino():
-  message = 'Nothing appened'
-  params = request.get_json(force=True)
-  arduinoController.openSerial(params['selectedPort'])
-  message = 'Serial reading started'
+  message = 'Nothing happened'
+  try:
+    params = request.get_json(force=True)
+    arduinoController.openSerial(params['selectedPort'])
+    message = 'Serial reading started'
+  except Exception as e:
+    print('Error: ', e)
+    message = 'An error has occurred starting the arduino'
   return jsonify({"message": message})
 
 @apirouter.route('/stopArduino',methods=['GET'])
 def stopArduino():
-  message = 'Nothing appened'
+  message = 'Nothing happened'
   try:
     arduinoController.stopSerial()
     message = 'Stop message sent'
   except Exception as e:
     print('Error: ', e)
-    message = 'An error has occurred'
+    message = 'An error has occurred stopping the arduino'
   return jsonify({"message": message})
+
+@apirouter.route('/sendCommandToArduino', methods=['POST'])
+def sendCommandToArduino():
+  message = 'Nothing happened'
+  try:
+    params = request.get_json(force=True)
+    arduinoController.sendCommand(params['command'])
+    message = 'Command sent'
+  except Exception as e:
+    print('Error: ', e)
+    message = 'An error has occurred sending command to the arduino'
+  return jsonify({"message": message})
+
 
 @apirouter.route('/getPageUpdate',methods=['GET'])
 def getPageUpdate():
