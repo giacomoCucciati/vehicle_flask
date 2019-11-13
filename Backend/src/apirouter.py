@@ -53,6 +53,19 @@ def sendCommandToArduino():
     message = 'An error has occurred sending command to the arduino'
   return jsonify({"message": message})
 
+@apirouter.route('/releaseCommandToArduino', methods=['POST'])
+def releaseCommandToArduino():
+  message = 'Nothing happened'
+  try:
+    params = request.get_json(force=True)
+    releaseCommand = '-' + params['command']
+    arduinoController.sendCommand(releaseCommand)
+    message = 'Command sent'
+  except Exception as e:
+    print('Error: ', e)
+    message = 'An error has occurred sending command to the arduino'
+  return jsonify({"message": message})
+
 
 @apirouter.route('/getPageUpdate',methods=['GET'])
 def getPageUpdate():
