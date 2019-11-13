@@ -1,12 +1,16 @@
 from flask import Blueprint, jsonify
 from flask_socketio import emit, join_room, leave_room
 from flask import request
+from flask import Response
 from . import socketio
 from .arduinoController import ArduinoController
 import time
 import logging
 import os
 import json
+import io
+from .camera_pi import Camera
+from threading import Condition
 
 apirouter = Blueprint("router", __name__)
 arduinoController = ArduinoController()
@@ -17,6 +21,7 @@ configFile = open(os.path.join("static", "config.json"), "r")
 json_data = json.load(configFile)
 print(json_data)
 portList = json_data['portlist']
+
 
 @apirouter.route('/startArduino',methods=['POST'])
 def startArduino():
@@ -61,3 +66,15 @@ def getPageUpdate():
     "portlist": portList, 
   }
   return jsonify(answer)
+
+
+def gen(camera): 
+    """Video streaming generator function."""
+    while True:
+        frame = camera.get_frame()
+        yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+@apirouter.route('/video_feed') 
+def video_feed(): 
+    """Video streaming route. Put this in the src attribute of an img tag.""" 
+    return Response(gen(Camera()),mimetype='multipart/x-mixed-replace; boundary=frame')
