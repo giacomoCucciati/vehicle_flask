@@ -40,6 +40,8 @@
 import axios from 'axios'
 import io from 'socket.io-client'
 
+const charList = new Map([['a', 0], ['s', 0], ['d', 0], ['w', 0]])
+
 export default {
   name: 'InitPage',
   data () {
@@ -79,6 +81,13 @@ export default {
     sendCommand: function (theCommand) {
       console.log(theCommand)
       axios.post('/api/sendCommandToArduino', {command: theCommand}).then(response => {
+        console.log(response.data.message)
+      })
+    },
+
+    releaseCommand: function (theCommand) {
+      console.log(theCommand)
+      axios.post('/api/releaseCommandToArduino', {command: theCommand}).then(response => {
         console.log(response.data.message)
       })
     },
@@ -196,6 +205,30 @@ export default {
     this.socket.on('updateSinglePoint', () => this.askOnePoint())
 
     this.defineChartOptions()
+
+    document.onkeypress = (evt) => {
+      evt = evt || window.event
+      var charCode = evt.keyCode || evt.which
+      var charStr = String.fromCharCode(charCode)
+      charStr = charStr.toLowerCase()
+      if (charList.has(charStr)) {
+        if (!charList.get(charStr)) {
+          this.sendCommand(charStr)
+          charList.set(charStr, 1)
+        }
+      }
+    }
+
+    document.onkeyup = (evt) => {
+      evt = evt || window.event
+      var charCode = evt.keyCode || evt.which
+      var charStr = String.fromCharCode(charCode)
+      charStr = charStr.toLowerCase()
+      if (charList.has(charStr)) {
+        this.releaseCommand(charStr)
+        charList.set(charStr, 0)
+      }
+    }
   },
 
   beforeRouteLeave (to, from, next) {
