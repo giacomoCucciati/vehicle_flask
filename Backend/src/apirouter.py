@@ -46,12 +46,13 @@ def sendCommandToArduino():
   message = 'Nothing happened'
   try:
     params = request.get_json(force=True)
+    print(params['clicktime'])
     arduinoController.sendCommand(params['command'])
     message = 'Command sent'
   except Exception as e:
     print('Error: ', e)
     message = 'An error has occurred sending command to the arduino'
-  return jsonify({"message": message})
+  return jsonify({"message": message, 'servertime':time.time()})
 
 @apirouter.route('/releaseCommandToArduino', methods=['POST'])
 def releaseCommandToArduino():

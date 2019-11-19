@@ -19,14 +19,19 @@
       </div>
       <div class="columns">
         <div class="column is-1">
-          <button v-on:click="sendCommand('a')">Left</button>
+          <button v-on:click="sendCommand('a')" disabled=true>Left</button>
         </div>
         <div class="column is-1">
-          <button v-on:click="sendCommand('w')">Forward</button>
-          <button v-on:click="sendCommand('s')">Backward</button>
+          <button v-on:click="sendCommand('w')" disabled=true>Forward</button>
+          <button v-on:click="sendCommand('s')" disabled=true>Backward</button>
         </div>
         <div class="column is-1">
-          <button v-on:click="sendCommand('d')">Right</button>
+          <button v-on:click="sendCommand('d')" disabled=true>Right</button>
+        </div>
+        <div class="column is-1">
+          <b-field label="Delta ms">
+            <b-input v-model="deltatime"></b-input>
+          </b-field>
         </div>
       </div>
     </div>
@@ -51,7 +56,8 @@ export default {
       selectedPort: '',
       chartOptions: {
         series: []
-      }
+      },
+      deltatime: 0
     }
   },
 
@@ -77,8 +83,11 @@ export default {
 
     sendCommand: function (theCommand) {
       console.log(theCommand)
-      axios.post('/api/sendCommandToArduino', {command: theCommand}).then(response => {
+      let clicktime = (new Date()).getTime()
+      axios.post('/api/sendCommandToArduino', {command: theCommand, clicktime: clicktime}).then(response => {
         console.log(response.data.message)
+        this.deltatime = response.data.servertime * 1000 - clicktime
+        console.log('server time ', response.data.servertime, ' clicktime ', clicktime)
       })
     },
 
