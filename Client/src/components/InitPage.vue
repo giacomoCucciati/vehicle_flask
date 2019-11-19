@@ -33,6 +33,9 @@
             <b-input v-model="deltatime"></b-input>
           </b-field>
         </div>
+        <div class="column">
+          <img src="api/video_feed" width="640" height="480">
+        </div>
       </div>
     </div>
   </div>
