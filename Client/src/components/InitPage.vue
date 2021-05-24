@@ -11,31 +11,27 @@
           </option>
         </b-select>
       </b-field>
-      <button v-on:click="startArduino">Start reading xbee</button>
-      <button v-on:click="stopArduino">Stop reading xbee</button>
-      <button v-on:click="fakeAcquisition">Fake points</button>
-      <div v-if="this.chartOptions !== undefined">
-        <highcharts :options="chartOptions" ref="lineCharts"></highcharts>
-      </div>
+      <button v-on:click="startArduino">Connect Arduino</button>
+      <button v-on:click="stopArduino">Disconnect Arduino</button>
       <div class="columns">
         <div class="column is-1">
-          <button v-on:click="sendCommand('a')" disabled=true>Left</button>
+          <button v-on:click="sendCommand('a')">Left</button>
         </div>
         <div class="column is-1">
-          <button v-on:click="sendCommand('w')" disabled=true>Forward</button>
-          <button v-on:click="sendCommand('s')" disabled=true>Backward</button>
+          <button v-on:click="sendCommand('w')">Forward</button>
+          <button v-on:click="sendCommand('s')">Backward</button>
         </div>
         <div class="column is-1">
-          <button v-on:click="sendCommand('d')" disabled=true>Right</button>
+          <button v-on:click="sendCommand('d')">Right</button>
         </div>
         <div class="column is-1">
           <b-field label="Delta ms">
             <b-input v-model="deltatime"></b-input>
           </b-field>
         </div>
-        <div class="column">
+        <!-- <div class="column">
           <img src="api/video_feed" width="640" height="480">
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -78,12 +74,6 @@ export default {
       })
     },
 
-    fakeAcquisition: function () {
-      axios.get('/api/startFakeAcq').then(response => {
-        console.log(response.data.message)
-      })
-    },
-
     sendCommand: function (theCommand) {
       console.log(theCommand)
       let clicktime = (new Date()).getTime()
@@ -105,100 +95,6 @@ export default {
       axios.get('/api/getPageUpdate').then(response => {
         this.port_list = response.data.portlist
         this.selectedPort = response.data.selectedPort
-
-        response.data.pointList.forEach(point => {
-          this.light_points.push([point.timestamp, point.lum])
-          this.pitemperature_points.push([point.timestamp, point.pitemp])
-          this.temperatureDTH_points.push([point.timestamp, point.tempDTH])
-          this.humidityDTH_points.push([point.timestamp, point.humDTH])
-        })
-      })
-    },
-
-    defineChartOptions () {
-      this.chartOptions['chart'] = {
-        type: 'scatter',
-        zoomType: 'x'
-      }
-      this.chartOptions['title'] = {
-        text: 'Measurements'
-        // margin: -44
-      }
-      this.chartOptions['xAxis'] = {
-        title: {
-          text: 'Time'
-        },
-        type: 'datetime',
-        dateTimeLabelFormats: {
-          second: '%H:%M:%S'
-        }
-      }
-      this.chartOptions['yAxis'] = {
-        title: {
-          text: 'Celsius or ADC counts'
-        }
-        // min: 0,
-        // max: 1024
-      }
-      this.chartOptions['plotOptions'] = {
-        series: {
-          animation: false
-        }
-      }
-      this.chartOptions['series'].push({
-        name: 'PI Temp',
-        color: 'rgba(233, 233, 0, 0.7)',
-        data: this.pitemperature_points,
-        marker: {
-          symbol: 'cyrcle'
-        }
-      })
-      this.chartOptions['series'].push({
-        name: 'Light',
-        color: 'rgba(0, 255, 0, 0.7)',
-        data: this.light_points,
-        marker: {
-          symbol: 'cyrcle'
-        }
-      })
-      this.chartOptions['series'].push({
-        name: 'TempDTH',
-        color: 'rgba(255, 0, 0, 0.7)',
-        data: this.temperatureDTH_points,
-        marker: {
-          symbol: 'cyrcle'
-        }
-      })
-      this.chartOptions['series'].push({
-        name: 'HumDTH',
-        color: 'rgba(125, 125, 125, 0.7)',
-        data: this.humidityDTH_points,
-        marker: {
-          symbol: 'cyrcle'
-        }
-      })
-    },
-
-    askOnePoint () {
-      // console.log('Request from server to get the last point.')
-      axios.get('/api/getSinglePoint').then(r => {
-        // console.log(r)
-        this.light_points.push([r.data.singlePoint.timestamp, r.data.singlePoint.lum])
-        this.pitemperature_points.push([r.data.singlePoint.timestamp, r.data.singlePoint.pitemp])
-        this.temperatureDTH_points.push([r.data.singlePoint.timestamp, r.data.singlePoint.tempDTH])
-        this.humidityDTH_points.push([r.data.singlePoint.timestamp, r.data.singlePoint.humDTH])
-        if (this.light_points.length > 1000) {
-          this.light_points.shift()
-        }
-        if (this.pitemperature_points.length > 1000) {
-          this.pitemperature_points.shift()
-        }
-        if (this.temperatureDTH_points.length > 1000) {
-          this.temperatureDTH_points.shift()
-        }
-        if (this.humidityDTH_points.length > 1000) {
-          this.humidityDTH_points.shift()
-        }
       })
     }
   },
@@ -209,11 +105,6 @@ export default {
 
     // Creating the socket for updates notifications
     this.socket = io()
-
-    // Callback for update event
-    this.socket.on('updateSinglePoint', () => this.askOnePoint())
-
-    this.defineChartOptions()
 
     document.onkeypress = (evt) => {
       evt = evt || window.event

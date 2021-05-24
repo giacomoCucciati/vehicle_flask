@@ -15,10 +15,6 @@ class ArduinoController:
     print('Connecting to device', port)
     self.ser = Serial(port, 9600, timeout=None)
     self.ser.flushInput()
-
-  def stopSerial(self):
-    print("Empty function")
-    #self.ser.close() 
   
   def sendCommand(self, command):
     print('Sending command', command, 'to arduino')

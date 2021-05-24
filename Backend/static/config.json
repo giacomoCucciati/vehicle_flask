@@ -7,6 +7,7 @@
     "/dev/ttyUSB3",
     "/dev/tty.usbserial-A9CZ7XPL",
     "/dev/tty.usbserial-A8007ZmJ",
-    "/dev/tty.usbmodem1421"
+    "/dev/tty.usbmodem1421",
+    "/dev/tty.usbmodem14101"
   ]
 }
